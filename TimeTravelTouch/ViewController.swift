@@ -11,6 +11,8 @@ import UIKit
 class ViewController: UIViewController {
     
     var label: UILabel?
+    var timesPressed: Int = 0
+    var delayForTouch: Double = 0.01
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -30,19 +32,31 @@ class ViewController: UIViewController {
     func allowTouch() {
         canTouch = true
         label?.alpha = 0
-        label?.text = "Touch Me."
         
+        if(timesPressed<15) {
+            label?.text = "Touch Me."
+        }
+        else if(timesPressed<20) {
+            label?.text = "..."
+        }
+        else {
+            label?.text = "Keep going..."
+        }
         
+        // And also show the message since touch is now allowed again
         UIView.animateWithDuration(0.5, animations: { () -> Void in
-            
-            //
             self.label!.alpha = 1
+            self.view.backgroundColor = UIColor.whiteColor()
         })
-
-        /*
-        UIView.animateWithDuration(NSTimeInterval(0.25), animations: { (t) -> Void in
-            self.label?.layer.opacity = 1
-        })*/
+        
+    }
+    
+    func acceptTouch() {
+        label?.text = "Well done."
+        self.view.backgroundColor = UIColor.redColor()
+        
+        NSTimer.scheduledTimerWithTimeInterval(1.75, target: self, selector: "allowTouch", userInfo: nil, repeats: false)
+        timesPressed++
     }
     
     var isTouching = false
@@ -53,8 +67,12 @@ class ViewController: UIViewController {
         
         isTouching = true
         
-        label?.text = ""
-        NSTimer.scheduledTimerWithTimeInterval(1.75, target: self, selector: "allowTouch", userInfo: nil, repeats: false)
+        if timesPressed>10 {
+            delayForTouch = 0.0
+        }
+        
+        NSTimer.scheduledTimerWithTimeInterval(delayForTouch, target: self, selector: "acceptTouch", userInfo: nil, repeats: false)
+        
     }
     
     override func touchesCancelled(touches: NSSet!, withEvent event: UIEvent!) {
